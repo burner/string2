@@ -7,6 +7,7 @@ struct String {
 @safe:
     enum SmallStringSize = 59;
     private union {
+        // 59 + trailing \0
         char[SmallStringSize + 1] direct;
         char* ptr;
     }
