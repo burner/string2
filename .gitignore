@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/string2
+string2.so
+string2.dylib
+string2.dll
+string2.a
+string2.lib
+string2-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst

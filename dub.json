@@ -1,0 +1,10 @@
+{
+	"authors": [
+		"Robert Schadek"
+	],
+	"copyright": "Copyright © 2025, Robert Schadek",
+	"description": "A string library for dlang",
+    "dflags": ["-checkaction=context"],
+	"license": "BSL-1.0",
+	"name": "string2"
+}

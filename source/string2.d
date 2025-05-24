@@ -1,0 +1,101 @@
+module string2;
+
+import core.memory;
+
+struct String {
+@safe:
+    private union {
+        char[60] direct;
+        char* ptr;
+    }
+    private uint len;
+
+    size_t length() @property const nothrow {
+        return this.len;
+    }
+
+    this(string s) {
+        this.assign(s);
+    }
+
+    this(ref return scope String rhs) {
+        this.assign(rhs);
+    }
+
+    ~this() {
+        if(this.len > 59) {
+            () @trusted {
+                GC.free(this.ptr);
+            }();
+        }
+    }
+
+    void opAssign(string s) {
+        this.assign(s);
+    }
+
+    void opAssign(String s) {
+        this.assign(s);
+    }
+
+    bool opEquals(string s) const nothrow {
+        if(this.len != s.length) {
+            return false;
+        } else if(this.len < 59) {
+            return this.direct[0 .. this.len] == s;
+        } else {
+            return () @trusted {
+                return this.ptr[0 .. this.len] == s;
+            }();
+        }
+    }
+
+    private void assign(ref return scope String rhs) {
+        if(rhs.length < 59) {
+            this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
+        } else {
+            () @trusted {
+                this.ptr = allocateCharArray(rhs.length);
+                this.ptr[0 .. rhs.length] = rhs.ptr[0 .. rhs.length];
+                this.ptr[rhs.length] = '\0';
+            }();
+        }
+        this.len = cast(uint)rhs.length;
+    }
+
+    private void assign(string s) {
+        if(s.length < 59) {
+            this.direct[0 .. s.length] = s;
+            this.direct[s.length] = '\0';
+        } else {
+            () @trusted {
+                this.ptr = allocateCharArray(s.length);
+                this.ptr[0 .. s.length] = s[];
+                this.ptr[s.length] = '\0';
+            }();
+        }
+        this.len = cast(uint)s.length;
+    }
+
+}
+
+static assert(String.sizeof == 64);
+
+private char* allocateCharArray(size_t len) @trusted {
+    const toAlloc = roundUpTo64(len);
+    return cast(char*)GC.malloc(toAlloc);
+}
+
+private size_t roundUpTo64(size_t len) @safe nothrow pure {
+    len++;
+    size_t ret = ((len + 63) >> 6) << 6;
+    return ret;
+}
+
+unittest {
+    assert(roundUpTo64(0) == 64);
+    assert(roundUpTo64(1) == 64);
+    assert(roundUpTo64(64) == 128);
+    assert(roundUpTo64(65) == 128);
+    assert(roundUpTo64(128) == 192);
+}
