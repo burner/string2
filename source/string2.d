@@ -1,5 +1,6 @@
 module string2;
 
+import core.exception : RangeError;
 import core.memory;
 
 struct String {
@@ -46,6 +47,19 @@ struct String {
         } else {
             return () @trusted {
                 return this.ptr[0 .. this.len] == s;
+            }();
+        }
+    }
+
+    char opIndex(size_t idx) const {
+        if(idx >= this.length) {
+            throw new RangeError("out of bounds access attempt");
+        }
+        if(idx < 59) {
+            return this.direct[idx];
+        } else {
+            return () @trusted {
+                return this.ptr[idx];
             }();
         }
     }

@@ -6,6 +6,8 @@ unittest {
     auto s = String("Hello");
     assert(s.length == 5);
     assert(s == "Hello");
+    assert(s != "World");
+    assert(s != "Wor");
 
     auto r = String(s);
     assert(r == "Hello");
@@ -26,4 +28,12 @@ unittest {
     assert(r == i);
     s = r;
     assert(s == i);
+}
+
+unittest {
+    string i = "Hello";
+    auto s = String(i);
+    foreach(c; 0 .. i.length) {
+        assert(s[c] == i[c]);
+    }
 }
