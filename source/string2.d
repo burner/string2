@@ -5,8 +5,9 @@ import core.memory;
 
 struct String {
 @safe:
+    enum SmallStringSize = 59;
     private union {
-        char[60] direct;
+        char[SmallStringSize + 1] direct;
         char* ptr;
     }
     private uint len;
@@ -24,7 +25,7 @@ struct String {
     }
 
     ~this() {
-        if(this.len > 59) {
+        if(this.len > SmallStringSize) {
             () @trusted {
                 GC.free(this.ptr);
             }();
@@ -42,7 +43,7 @@ struct String {
     bool opEquals(string s) const nothrow {
         if(this.len != s.length) {
             return false;
-        } else if(this.len < 59) {
+        } else if(this.len < SmallStringSize) {
             return this.direct[0 .. this.len] == s;
         } else {
             return () @trusted {
@@ -55,7 +56,7 @@ struct String {
         if(idx >= this.length) {
             throw new RangeError("out of bounds access attempt");
         }
-        if(idx < 59) {
+        if(idx < SmallStringSize) {
             return this.direct[idx];
         } else {
             return () @trusted {
@@ -65,7 +66,7 @@ struct String {
     }
 
     private void assign(ref return scope String rhs) {
-        if(rhs.length < 59) {
+        if(rhs.length < SmallStringSize) {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
         } else {
             () @trusted {
@@ -78,7 +79,7 @@ struct String {
     }
 
     private void assign(string s) {
-        if(s.length < 59) {
+        if(s.length < SmallStringSize) {
             this.direct[0 .. s.length] = s;
             this.direct[s.length] = '\0';
         } else {
