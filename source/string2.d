@@ -90,7 +90,6 @@ struct String {
         }
         this.len = cast(uint)s.length;
     }
-
 }
 
 static assert(String.sizeof == 64);
