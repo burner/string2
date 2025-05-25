@@ -111,6 +111,14 @@ struct String {
         }
         this.len = cast(uint)s.length;
     }
+
+    private static void append(ref String sink, ref String src) {
+        if(sink.len + src.len + 1 < SmallStringSize) {
+            sink.direct[sink.len .. sink.len + src.len] = src.direct[0 .. src.len];
+            sink.len = sink.len + src.len;
+            sink.direct[sink.len] = '\0';
+        }
+    }
 }
 
 static assert(String.sizeof == 64);
