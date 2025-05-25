@@ -113,6 +113,43 @@ struct String {
         this.len = cast(uint)s.length;
     }
 
+    static void append(ref String sink, string src) {
+        /* ss = small space, h = Heap
+            | Sink | Rslt | Copy From SS |
+            | ss   | ss   | No
+            | ss   | h    | Yes
+            | ss   | h    | Yes
+            | h    | h    | No
+            | h    | h    | No
+        */
+        const newLen = sink.len + src.length;
+        if(newLen < SmallStringSize) {
+            sink.direct[sink.len .. sink.len + src.length] = src[0 .. src.length];
+            sink.len = cast(uint)(sink.len + src.length);
+            sink.direct[sink.len] = '\0';
+        } else if(newLen >= SmallStringSize) {
+            () @trusted {
+            if(sink.len < SmallStringSize) {
+                String tmp = sink;
+                sink.ptr.capacity = roundUpTo64(newLen);
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[0 .. tmp.len] = tmp.direct[0 .. tmp.len];
+                sink.ptr.ptr[tmp.len .. tmp.len + src.length] = src[0 .. src.length];
+                sink.ptr.ptr[tmp.len + src.length] = '\0';
+            } else {
+                if(newLen > sink.ptr.capacity) {
+                    GC.realloc(sink.ptr.ptr, newLen);
+                    sink.ptr.capacity = roundUpTo64(newLen);
+                }
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[sink.len .. sink.len + src.length] = src[0 .. src.length];
+                sink.ptr.ptr[sink.len + src.length] = '\0';
+            }
+            }();
+            sink.len = cast(uint)newLen;
+        }
+    }
+
     static void append(ref String sink, ref String src) {
         /* ss = small space, h = Heap
             | Sink | Src | Rslt | Copy From SS |
