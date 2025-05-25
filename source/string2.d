@@ -2,6 +2,7 @@ module string2;
 
 import core.exception : RangeError;
 import core.memory;
+import std.stdio;
 
 struct String {
 @safe:
@@ -61,7 +62,7 @@ struct String {
         if(idx >= this.length) {
             throw new RangeError("out of bounds access attempt");
         }
-        if(idx < SmallStringSize) {
+        if(this.len < SmallStringSize) {
             return this.direct[idx];
         } else {
             return () @trusted {
@@ -74,7 +75,7 @@ struct String {
         if(idx >= this.length) {
             throw new RangeError("out of bounds access attempt");
         }
-        if(idx < SmallStringSize) {
+        if(this.len < SmallStringSize) {
             this.direct[idx] = v;
         } else {
             () @trusted {
@@ -112,7 +113,7 @@ struct String {
         this.len = cast(uint)s.length;
     }
 
-    static void append(ref String sink, ref String src) @trusted {
+    static void append(ref String sink, ref String src) {
         /* ss = small space, h = Heap
             | Sink | Src | Rslt | Copy From SS |
             | ss   | ss  | ss   | No
@@ -127,7 +128,7 @@ struct String {
             sink.len = sink.len + src.len;
             sink.direct[sink.len] = '\0';
         } else if(newLen >= SmallStringSize) {
-            //() @trusted {
+            () @trusted {
             if(sink.len < SmallStringSize && src.len < SmallStringSize) {
                 String tmp = sink;
                 sink.ptr.capacity = roundUpTo64(newLen);
@@ -159,7 +160,7 @@ struct String {
                 sink.ptr.ptr[sink.len .. sink.len + src.len] = src.ptr.ptr[0 .. src.len];
                 sink.ptr.ptr[sink.len + src.len] = '\0';
             }
-            //}();
+            }();
             sink.len = newLen;
         }
     }
