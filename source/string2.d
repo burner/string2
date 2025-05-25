@@ -5,13 +5,14 @@ import core.memory;
 
 struct String {
 @safe:
-    enum SmallStringSize = 59;
+    enum SmallStringSize = 55;
     private union {
         // 59 + trailing \0
         char[SmallStringSize + 1] direct;
         char* ptr;
     }
     private uint len;
+    private uint capacity;
 
     size_t length() @property const nothrow {
         return this.len;
@@ -71,7 +72,8 @@ struct String {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
         } else {
             () @trusted {
-                this.ptr = allocateCharArray(rhs.length);
+                this.capacity = cast(uint)roundUpTo64(rhs.length);
+                this.ptr = allocateCharArray(this.capacity);
                 this.ptr[0 .. rhs.length] = rhs.ptr[0 .. rhs.length];
                 this.ptr[rhs.length] = '\0';
             }();
@@ -85,7 +87,8 @@ struct String {
             this.direct[s.length] = '\0';
         } else {
             () @trusted {
-                this.ptr = allocateCharArray(s.length);
+                this.capacity = cast(uint)roundUpTo64(s.length);
+                this.ptr = allocateCharArray(this.capacity);
                 this.ptr[0 .. s.length] = s[];
                 this.ptr[s.length] = '\0';
             }();
