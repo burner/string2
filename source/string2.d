@@ -5,14 +5,17 @@ import core.memory;
 
 struct String {
 @safe:
-    enum SmallStringSize = 55;
+    enum SmallStringSize = 59;
+    private struct Ptr {
+        uint capacity;
+        char* ptr;
+    }
     private union {
         // 59 + trailing \0
         char[SmallStringSize + 1] direct;
-        char* ptr;
+        Ptr ptr;
     }
     private uint len;
-    private uint capacity;
 
     size_t length() @property const nothrow {
         return this.len;
@@ -29,7 +32,7 @@ struct String {
     ~this() {
         if(this.len > SmallStringSize) {
             () @trusted {
-                GC.free(this.ptr);
+                GC.free(this.ptr.ptr);
             }();
         }
     }
@@ -49,7 +52,7 @@ struct String {
             return this.direct[0 .. this.len] == s;
         } else {
             return () @trusted {
-                return this.ptr[0 .. this.len] == s;
+                return this.ptr.ptr[0 .. this.len] == s;
             }();
         }
     }
@@ -62,7 +65,7 @@ struct String {
             return this.direct[idx];
         } else {
             return () @trusted {
-                return this.ptr[idx];
+                return this.ptr.ptr[idx];
             }();
         }
     }
@@ -72,10 +75,10 @@ struct String {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
         } else {
             () @trusted {
-                this.capacity = cast(uint)roundUpTo64(rhs.length);
-                this.ptr = allocateCharArray(this.capacity);
-                this.ptr[0 .. rhs.length] = rhs.ptr[0 .. rhs.length];
-                this.ptr[rhs.length] = '\0';
+                this.ptr.capacity = cast(uint)roundUpTo64(rhs.length);
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[0 .. rhs.length] = rhs.ptr.ptr[0 .. rhs.length];
+                this.ptr.ptr[rhs.length] = '\0';
             }();
         }
         this.len = cast(uint)rhs.length;
@@ -87,10 +90,10 @@ struct String {
             this.direct[s.length] = '\0';
         } else {
             () @trusted {
-                this.capacity = cast(uint)roundUpTo64(s.length);
-                this.ptr = allocateCharArray(this.capacity);
-                this.ptr[0 .. s.length] = s[];
-                this.ptr[s.length] = '\0';
+                this.ptr.capacity = cast(uint)roundUpTo64(s.length);
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[0 .. s.length] = s[];
+                this.ptr.ptr[s.length] = '\0';
             }();
         }
         this.len = cast(uint)s.length;
