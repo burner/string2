@@ -1,6 +1,7 @@
 module string2test;
 
 import string2;
+import core.stdc.stdio : printf;
 
 unittest {
     auto s = String("Hello");
@@ -36,4 +37,5 @@ unittest {
     foreach(c; 0 .. i.length) {
         assert(s[c] == i[c]);
     }
+
 }
