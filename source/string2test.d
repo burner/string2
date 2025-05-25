@@ -81,6 +81,14 @@ unittest {
     cmpString(h, ct);
 }
 
+unittest {
+    String s = "Hello";
+    s ~= " World";
+    s ~= String("!");
+
+    cmpString(s, "Hello World!");
+}
+
 void cmpString(ref const(String) a, string b, int line = __LINE__) {
     if(a.length != b.length) {
         throw new AssertError("a.length = "

@@ -115,11 +115,9 @@ struct String {
 
     static void append(ref String sink, string src) {
         /* ss = small space, h = Heap
-            | Sink | Rslt | Copy From SS |
+            | Sink | Rslt | Copy From ss |
             | ss   | ss   | No
             | ss   | h    | Yes
-            | ss   | h    | Yes
-            | h    | h    | No
             | h    | h    | No
         */
         const newLen = sink.len + src.length;
@@ -148,6 +146,30 @@ struct String {
             }();
             sink.len = cast(uint)newLen;
         }
+    }
+
+    String opBinary(string op: "~")(ref const(String) rhs) const {
+        String ret = this;
+        String.append(ret, rhs);
+        return ret;
+    }
+
+    String opBinary(string op: "~")(string rhs) const {
+        String ret = this;
+        String.append(ret, rhs);
+        return ret;
+    }
+
+    void opOpAssign(string op: "~")(ref const(String) rhs) {
+        String.append(this, rhs);
+    }
+
+    void opOpAssign(string op: "~")(String rhs) {
+        String.append(this, rhs);
+    }
+
+    void opOpAssign(string op: "~")(string rhs) {
+        String.append(this, rhs);
     }
 
     static void append(ref String sink, ref String src) {
