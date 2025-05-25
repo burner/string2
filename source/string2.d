@@ -70,6 +70,19 @@ struct String {
         }
     }
 
+    void opIndexAssign(char v, size_t idx) {
+        if(idx >= this.length) {
+            throw new RangeError("out of bounds access attempt");
+        }
+        if(idx < SmallStringSize) {
+            this.direct[idx] = v;
+        } else {
+            () @trusted {
+                this.ptr.ptr[idx] = v;
+            }();
+        }
+    }
+
     private void assign(ref return scope String rhs) {
         if(rhs.length < SmallStringSize) {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];

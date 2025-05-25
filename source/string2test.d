@@ -37,5 +37,19 @@ unittest {
     foreach(c; 0 .. i.length) {
         assert(s[c] == i[c]);
     }
+}
 
+unittest {
+    String s = "Hello";
+    s[0] = 'h';
+    assert(s == "hello");
+}
+
+unittest {
+    string i = "Hello World Hello World Hello World Hello World Hello "
+        ~ "World Hello World Hello World Hello World Hello World Hello World";
+    auto s = String(i);
+    assert(s.length > 60);
+    s[0] = 'h';
+    assert(s[0] == 'h');
 }
