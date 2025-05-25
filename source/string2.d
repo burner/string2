@@ -7,7 +7,7 @@ struct String {
 @safe:
     enum SmallStringSize = 59;
     private struct Ptr {
-        uint capacity;
+        ulong capacity;
         char* ptr;
     }
     private union {
@@ -88,7 +88,7 @@ struct String {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
         } else {
             () @trusted {
-                this.ptr.capacity = cast(uint)roundUpTo64(rhs.length);
+                this.ptr.capacity = roundUpTo64(rhs.length);
                 this.ptr.ptr = allocateCharArray(this.ptr.capacity);
                 this.ptr.ptr[0 .. rhs.length] = rhs.ptr.ptr[0 .. rhs.length];
                 this.ptr.ptr[rhs.length] = '\0';
@@ -103,7 +103,7 @@ struct String {
             this.direct[s.length] = '\0';
         } else {
             () @trusted {
-                this.ptr.capacity = cast(uint)roundUpTo64(s.length);
+                this.ptr.capacity = roundUpTo64(s.length);
                 this.ptr.ptr = allocateCharArray(this.ptr.capacity);
                 this.ptr.ptr[0 .. s.length] = s[];
                 this.ptr.ptr[s.length] = '\0';
@@ -112,11 +112,55 @@ struct String {
         this.len = cast(uint)s.length;
     }
 
-    private static void append(ref String sink, ref String src) {
-        if(sink.len + src.len + 1 < SmallStringSize) {
+    static void append(ref String sink, ref String src) @trusted {
+        /* ss = small space, h = Heap
+            | Sink | Src | Rslt | Copy From SS |
+            | ss   | ss  | ss   | No
+            | ss   | ss  | h    | Yes
+            | ss   | h   | h    | Yes
+            | h    | ss  | h    | No
+            | h    | h   | h    | No
+        */
+        const newLen = sink.len + src.len;
+        if(newLen < SmallStringSize) {
             sink.direct[sink.len .. sink.len + src.len] = src.direct[0 .. src.len];
             sink.len = sink.len + src.len;
             sink.direct[sink.len] = '\0';
+        } else if(newLen >= SmallStringSize) {
+            //() @trusted {
+            if(sink.len < SmallStringSize && src.len < SmallStringSize) {
+                String tmp = sink;
+                sink.ptr.capacity = roundUpTo64(newLen);
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[0 .. tmp.len] = tmp.direct[0 .. tmp.len];
+                sink.ptr.ptr[tmp.len .. tmp.len + src.len] = src.direct[0 .. src.len];
+                sink.ptr.ptr[tmp.len + src.len] = '\0';
+            } else if(sink.len < SmallStringSize && src.len >= SmallStringSize) {
+                String tmp = sink;
+                sink.ptr.capacity = roundUpTo64(newLen);
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[0 .. tmp.len] = tmp.direct[0 .. tmp.len];
+                sink.ptr.ptr[tmp.len .. tmp.len + src.len] = src.ptr.ptr[0 .. src.len];
+                sink.ptr.ptr[tmp.len + src.len] = '\0';
+            } else if(sink.len >= SmallStringSize && src.len < SmallStringSize) {
+                if(newLen > sink.ptr.capacity) {
+                    GC.realloc(sink.ptr.ptr, newLen);
+                    sink.ptr.capacity = roundUpTo64(newLen);
+                }
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[sink.len .. sink.len + src.len] = src.direct[0 .. src.len];
+                sink.ptr.ptr[sink.len + src.len] = '\0';
+            } else { // if(sink.len >= SmallStringSize && src.len >= SmallStringSize) {
+                if(newLen > sink.ptr.capacity) {
+                    GC.realloc(sink.ptr.ptr, newLen);
+                    sink.ptr.capacity = roundUpTo64(newLen);
+                }
+                sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
+                sink.ptr.ptr[sink.len .. sink.len + src.len] = src.ptr.ptr[0 .. src.len];
+                sink.ptr.ptr[sink.len + src.len] = '\0';
+            }
+            //}();
+            sink.len = newLen;
         }
     }
 }
@@ -124,8 +168,7 @@ struct String {
 static assert(String.sizeof == 64);
 
 private char* allocateCharArray(size_t len) @trusted {
-    const toAlloc = roundUpTo64(len);
-    return cast(char*)GC.malloc(toAlloc);
+    return cast(char*)GC.malloc(len);
 }
 
 private size_t roundUpTo64(size_t len) @safe nothrow pure {

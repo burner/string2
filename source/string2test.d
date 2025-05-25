@@ -1,7 +1,9 @@
 module string2test;
 
 import string2;
+import core.exception : AssertError;
 import core.stdc.stdio : printf;
+import std.conv;
 
 unittest {
     auto s = String("Hello");
@@ -52,4 +54,36 @@ unittest {
     assert(s.length > 60);
     s[0] = 'h';
     assert(s[0] == 'h');
+}
+
+unittest {
+    String h = "Hello ";
+    String w = "World";
+    String.append(h, w);
+    assert(h == "Hello World");
+}
+
+unittest {
+    String h = "Hello Hello Hello Hello Hello Hello Hello ";
+    String w = "Hello Hello Hello Hello Hello Hello Hello ";
+    string ct = "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello "
+        ~ "Hello Hello Hello Hello ";
+    String.append(h, w);
+    cmpString(h, ct);
+}
+
+void cmpString(ref const(String) a, string b, int line = __LINE__) {
+    if(a.length != b.length) {
+        throw new AssertError("a.length = "
+            ~ to!(string)(a.length)
+            ~ " != b.length = "
+            ~ to!(string)(b.length), __FILE__, line);
+    }
+    foreach(idx; 0 .. a.length) {
+        if(a[idx] != b[idx]) {
+            throw new AssertError("idx " ~ to!(string)(idx)
+                ~ " a = '" ~ a[idx] ~ "' b = '" ~ b[idx] ~ "'"
+                ,  __FILE__, line);
+        }
+    }
 }
