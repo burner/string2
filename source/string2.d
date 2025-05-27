@@ -71,6 +71,39 @@ struct String {
         }
     }
 
+	String opSlice(size_t low, size_t high) {
+		if(low > high) {
+			throw new Exception("The low slice index must not be greater than "
+					~ "the high slice index");
+		}
+		if(high > this.length) {
+			throw new Exception("The high slice index must not be greater than "
+					~ "the length of the String to slice");
+		}
+
+        size_t toStore = high - low + 1;
+        String ret;
+        if(toStore < SmallStringSize) {
+            if(this.len < SmallStringSize) {
+                ret.direct = this.direct[low .. high];
+                ret.direct[high] = '\0';
+            } else {
+                () @trusted {
+                    ret.direct = this.ptr.ptr[low .. high];
+                }();
+                ret.direct[high] = '\0';
+            }
+        } else {
+            () @trusted {
+                ret.ptr.capacity = roundUpTo64(toStore);
+                ret.ptr.ptr = allocateCharArray(ret.ptr.capacity);
+                ret.ptr.ptr[0 .. toStore] = this.ptr.ptr[low .. high];
+            }();
+        }
+        ret.len = cast(uint)toStore;
+        return ret;
+    }
+
     void opIndexAssign(char v, size_t idx) {
         if(idx >= this.length) {
             throw new RangeError("out of bounds access attempt");
@@ -113,6 +146,48 @@ struct String {
         this.len = cast(uint)s.length;
     }
 
+    String opBinary(string op: "~")(ref const(String) rhs) const {
+        String ret = this;
+        String.append(ret, rhs);
+        return ret;
+    }
+
+    String opBinary(string op: "~")(string rhs) const {
+        String ret = this;
+        String.append(ret, rhs);
+        return ret;
+    }
+
+    void opOpAssign(string op: "~")(ref const(String) rhs) {
+        String.append(this, rhs);
+    }
+
+    void opOpAssign(string op: "~")(String rhs) {
+        String.append(this, rhs);
+    }
+
+    void opOpAssign(string op: "~")(string rhs) {
+        String.append(this, rhs);
+    }
+
+    bool isNullTerminated() const {
+        if(this.len < SmallStringSize) {
+            return this.direct[this.len] == '\0';
+        } else {
+            return () @trusted {
+                return this.ptr.ptr[this.len] == '\0';
+            }();
+        }
+    }
+
+    const(char)* toStringZ() @trusted {
+        if(this.len < SmallStringSize) {
+            return this.direct.ptr;
+        } else {
+            return this.ptr.ptr;
+        }
+    }
+
     static void append(ref String sink, string src) {
         /* ss = small space, h = Heap
             | Sink | Rslt | Copy From ss |
@@ -146,30 +221,6 @@ struct String {
             }();
             sink.len = cast(uint)newLen;
         }
-    }
-
-    String opBinary(string op: "~")(ref const(String) rhs) const {
-        String ret = this;
-        String.append(ret, rhs);
-        return ret;
-    }
-
-    String opBinary(string op: "~")(string rhs) const {
-        String ret = this;
-        String.append(ret, rhs);
-        return ret;
-    }
-
-    void opOpAssign(string op: "~")(ref const(String) rhs) {
-        String.append(this, rhs);
-    }
-
-    void opOpAssign(string op: "~")(String rhs) {
-        String.append(this, rhs);
-    }
-
-    void opOpAssign(string op: "~")(string rhs) {
-        String.append(this, rhs);
     }
 
     static void append(ref String sink, ref String src) {
