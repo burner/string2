@@ -180,7 +180,7 @@ struct String {
         }
     }
 
-    const(char)* toStringZ() @trusted {
+    const(char)* toStringZ() const @trusted {
         if(this.len < SmallStringSize) {
             return this.direct.ptr;
         } else {
