@@ -1,4 +1,4 @@
-module string2;
+module string2.type;
 
 import core.exception : RangeError;
 import core.memory;

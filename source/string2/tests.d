@@ -1,6 +1,6 @@
-module string2test;
+module string2.tests;
 
-import string2;
+import string2.type;
 import core.exception : AssertError;
 import core.stdc.stdio : printf;
 import std.conv;
