@@ -5,7 +5,7 @@ import core.memory;
 import std.stdio;
 
 struct String {
-@safe:
+@safe pure:
     enum SmallStringSize = 59;
     private struct Ptr {
         ulong capacity;
@@ -117,7 +117,7 @@ struct String {
         }
     }
 
-    private void assign(ref return scope String rhs) {
+    private void assign(ref const(String) rhs) {
         if(rhs.length < SmallStringSize) {
             this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
         } else {
@@ -278,7 +278,7 @@ struct String {
 
 static assert(String.sizeof == 64);
 
-private char* allocateCharArray(size_t len) @trusted {
+private char* allocateCharArray(size_t len) @trusted pure {
     return cast(char*)GC.malloc(len);
 }
 
