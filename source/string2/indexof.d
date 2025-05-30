@@ -1,6 +1,5 @@
 module string2.indexof;
 
-debug import std.stdio;
 import string2.type;
 
 @safe pure:
