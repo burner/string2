@@ -5,8 +5,9 @@ import string2.type;
 @safe pure:
 
 size_t indexOf(in const(String) toSearchIn, char toSearch) {
+    const(char)* ptr = toSearchIn.toStringZ();
     for(size_t idx = 0; idx < toSearchIn.length; ++idx) {
-        if(toSearchIn[idx] == toSearch) {
+        if(() @trusted { return ptr[idx]; }() == toSearch) {
             return idx;
         }
     }
@@ -22,9 +23,12 @@ size_t indexOf(in const(String) toSearchIn, in const(String) toSearch) {
         return toSearchIn.length;
     }
 
+    const(char)* toSearchInPtr = toSearchIn.toStringZ();
+    const(char)* toSearchPtr = toSearch.toStringZ();
+
     outer: for(size_t idx = 0; idx <= toSearchIn.length - toSearch.length; ++idx) {
         for(size_t jdx = 0; jdx < toSearch.length; ++jdx) {
-            if(toSearch[jdx] != toSearchIn[idx + jdx]) {
+            if(() @trusted { return toSearchPtr[jdx] != toSearchInPtr[idx + jdx]; }()) {
                 continue outer;
             }
         }
@@ -38,9 +42,10 @@ size_t indexOf(in const(String) toSearchIn, in const(string) toSearch) {
         return toSearchIn.length;
     }
 
+    const(char)* toSearchInPtr = toSearchIn.toStringZ();
     outer: for(size_t idx = 0; idx <= toSearchIn.length - toSearch.length; ++idx) {
         for(size_t jdx = 0; jdx < toSearch.length; ++jdx) {
-            if(toSearch[jdx] != toSearchIn[idx + jdx]) {
+            if(() @trusted { return toSearch[jdx] != toSearchInPtr[idx + jdx]; }()) {
                 continue outer;
             }
         }
