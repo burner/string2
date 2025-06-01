@@ -1,9 +1,9 @@
 module string2.tests;
 
 import string2.type;
-import core.exception : AssertError;
-import core.stdc.stdio : printf;
-import std.conv;
+import string2.testhelper;
+
+@safe pure:
 
 unittest {
     auto s = String("Hello");
@@ -133,20 +133,4 @@ unittest { // stay in heap
     h.popFront(4);
     assert(h.isNullTerminated());
     cmpString(h, ct[4 .. $]);
-}
-
-void cmpString(ref const(String) a, string b, int line = __LINE__) {
-    if(a.length != b.length) {
-        throw new AssertError("a.length = "
-            ~ to!(string)(a.length)
-            ~ " != b.length = "
-            ~ to!(string)(b.length), __FILE__, line);
-    }
-    foreach(idx; 0 .. a.length) {
-        if(a[idx] != b[idx]) {
-            throw new AssertError("idx " ~ to!(string)(idx)
-                ~ " a = '" ~ a[idx] ~ "' b = '" ~ b[idx] ~ "'"
-                ,  __FILE__, line);
-        }
-    }
 }

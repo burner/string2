@@ -12,9 +12,10 @@ void stripLeftInPlace(ref String str, in String toStrip) {
 
     outer: for(; striped < str.length; ++striped) {
         for(uint i = 0; i < toStrip.length; ++i) {
-            if(() @trusted { return strPtr[striped] == toStripPtr[i]; }()) {
-                continue outer;
+            if(() @trusted { return strPtr[striped] != toStripPtr[i]; }()) {
+                break outer;
             }
         }
     }
+    str.popFront(striped);
 }
