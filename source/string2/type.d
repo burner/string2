@@ -180,12 +180,49 @@ struct String {
         }
     }
 
-    const(char)* toStringZ() const @trusted {
+    @property bool empty() const nothrow {
+        return this.len == 0;
+    }
+
+    @property bool notEmpty() const nothrow {
+        return this.len > 0;
+    }
+
+    scope const(char)* toStringZ() const @trusted {
         if(this.len < SmallStringSize) {
             return this.direct.ptr;
         } else {
             return this.ptr.ptr;
         }
+    }
+
+    void popFront(uint cntToPop) {
+        cntToPop = cntToPop > this.len ? this.len : cntToPop;
+        uint remaining = this.len - cntToPop;
+        if(this.len < SmallStringSize) {
+            for(uint i = 0; i < remaining; ++i) {
+                this.direct[i] = this.direct[i + cntToPop];
+            }
+            this.direct[remaining] = '\0';
+        } else if(remaining < SmallStringSize && this.len > SmallStringSize) {
+            // heap can be freed now
+            () @trusted {
+                const(char)* ptrC = this.ptr.ptr;
+                for(uint i = 0; i < remaining; ++i) {
+                    this.direct[i] = ptrC[i + cntToPop];
+                }
+                GC.free(cast(void*)ptrC);
+            }();
+            this.direct[remaining] = '\0';
+        } else { // stays on the heap
+            () @trusted {
+                for(uint i = 0; i < remaining; ++i) {
+                    this.ptr.ptr[i] = this.ptr.ptr[i + cntToPop];
+                }
+                this.ptr.ptr[remaining] = '\0';
+            }();
+        }
+        this.len = remaining;
     }
 
     static void append(ref String sink, string src) {

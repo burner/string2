@@ -108,6 +108,33 @@ unittest {
     cmpString(s, "Hello World!");
 }
 
+/** popFront
+*/
+unittest { // stay in direct
+    String h = "Hello World";
+    h.popFront(6);
+    assert(h.isNullTerminated());
+    cmpString(h, "World");
+}
+
+unittest { // move from heap to direct
+    string ct = "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello "
+        ~ "Hello Hello Hello Hello ";
+    String h = ct;
+    h.popFront(40);
+    assert(h.isNullTerminated());
+    cmpString(h, ct[40 .. $]);
+}
+
+unittest { // stay in heap
+    string ct = "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello "
+        ~ "Hello Hello Hello Hello ";
+    String h = ct;
+    h.popFront(4);
+    assert(h.isNullTerminated());
+    cmpString(h, ct[4 .. $]);
+}
+
 void cmpString(ref const(String) a, string b, int line = __LINE__) {
     if(a.length != b.length) {
         throw new AssertError("a.length = "
