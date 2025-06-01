@@ -14,9 +14,11 @@ bool endsWith(in const(String) toSearchIn, in const(String) toSearch) {
     }
 
     const offSet = toSearchIn.length - toSearch.length;
+    const(char)* toSearchInPtr = toSearchIn.toStringZ();
+    const(char)* toSearchPtr = toSearch.toStringZ();
 
     for(size_t idx = 0; idx < toSearch.length; ++idx) {
-        if(toSearch[idx] != toSearchIn[idx + offSet]) {
+        if(() @trusted { return toSearchPtr[idx] != toSearchInPtr[idx + offSet]; }()) {
             return false;
         }
     }
@@ -31,10 +33,12 @@ bool endsWith(in const(String) toSearchIn, in const(string) toSearch) {
     if(toSearchIn.length < toSearch.length) {
         return false;
     }
+
     const offSet = toSearchIn.length - toSearch.length;
+    const(char)* toSearchInPtr = toSearchIn.toStringZ();
 
     for(size_t idx = 0; idx < toSearch.length; ++idx) {
-        if(toSearch[idx] != toSearchIn[idx + offSet]) {
+        if(() @trusted { return toSearch[idx] != toSearchInPtr[idx + offSet]; }()) {
             return false;
         }
     }
