@@ -196,6 +196,29 @@ struct String {
         this.len = remaining;
     }
 
+    void popBack(uint cntToPop) {
+        cntToPop = cntToPop > this.len ? this.len : cntToPop;
+        uint remaining = this.len - cntToPop;
+        if(this.len < SmallStringSize) {
+            this.direct[remaining] = '\0';
+        } else if(remaining < SmallStringSize && this.len > SmallStringSize) {
+            // heap can be freed now
+            () @trusted {
+                const(char)* ptrC = this.ptr.ptr;
+                for(uint i = 0; i < remaining; ++i) {
+                    this.direct[i] = ptrC[i];
+                }
+                GC.free(cast(void*)ptrC);
+            }();
+            this.direct[remaining] = '\0';
+        } else { // stays on the heap
+            () @trusted {
+                this.ptr.ptr[remaining] = '\0';
+            }();
+        }
+        this.len = remaining;
+    }
+
     int opApply(scope int delegate(char n) @safe dg) {
         const(char)* strPtr = this.toStringZ();
         auto del = assumePure(dg);

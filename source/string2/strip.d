@@ -8,7 +8,7 @@ void stripLeftInPlace(ref String str, in String toStrip) {
     uint striped;
 
     const(char)* strPtr = str.toStringZ();
-    const(char)* toStripPtr = str.toStringZ();
+    const(char)* toStripPtr = toStrip.toStringZ();
 
     outer: for(; striped < str.length; ++striped) {
         for(uint i = 0; i < toStrip.length; ++i) {
@@ -18,4 +18,20 @@ void stripLeftInPlace(ref String str, in String toStrip) {
         }
     }
     str.popFront(striped);
+}
+
+void stripRightInPlace(ref String str, in String toStrip) {
+    int striped;
+
+    const(char)* strPtr = str.toStringZ();
+    const(char)* toStripPtr = toStrip.toStringZ();
+
+    outer: for(; striped < str.length; ++striped) {
+        for(uint i = 0; i < toStrip.length; ++i) {
+            if(() @trusted { return strPtr[str.length - 1 - striped] != toStripPtr[i]; }()) {
+                break outer;
+            }
+        }
+    }
+    str.popBack(striped);
 }

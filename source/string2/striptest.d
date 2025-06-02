@@ -12,3 +12,9 @@ unittest {
     stripLeftInPlace(h, String("H"));
     cmpString(h, "ello");
 }
+
+unittest {
+    String h = "Hello";
+    stripRightInPlace(h, String("o"));
+    cmpString(h, "Hell");
+}
