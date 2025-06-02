@@ -117,35 +117,6 @@ struct String {
         }
     }
 
-    private void assign(ref const(String) rhs) {
-        if(rhs.length < SmallStringSize) {
-            this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
-        } else {
-            () @trusted {
-                this.ptr.capacity = roundUpTo64(rhs.length);
-                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
-                this.ptr.ptr[0 .. rhs.length] = rhs.ptr.ptr[0 .. rhs.length];
-                this.ptr.ptr[rhs.length] = '\0';
-            }();
-        }
-        this.len = cast(uint)rhs.length;
-    }
-
-    private void assign(string s) {
-        if(s.length < SmallStringSize) {
-            this.direct[0 .. s.length] = s;
-            this.direct[s.length] = '\0';
-        } else {
-            () @trusted {
-                this.ptr.capacity = roundUpTo64(s.length);
-                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
-                this.ptr.ptr[0 .. s.length] = s[];
-                this.ptr.ptr[s.length] = '\0';
-            }();
-        }
-        this.len = cast(uint)s.length;
-    }
-
     String opBinary(string op: "~")(ref const(String) rhs) const {
         String ret = this;
         String.append(ret, rhs);
@@ -223,6 +194,59 @@ struct String {
             }();
         }
         this.len = remaining;
+    }
+
+    int opApply(scope int delegate(char n) @safe dg) {
+        const(char)* strPtr = this.toStringZ();
+        auto del = assumePure(dg);
+        for(size_t i = 0; i < this.len; ++i) {
+            int result = del(() @trusted { return strPtr[i]; }());
+            if(result) {
+                return result;
+            }
+        }
+        return 0;
+    }
+
+    int opApply(scope int delegate(size_t idx, char n) @safe dg) {
+        const(char)* strPtr = this.toStringZ();
+        auto del = assumePure(dg);
+        for(size_t i = 0; i < this.len; ++i) {
+            int result = del(i, () @trusted { return strPtr[i]; }());
+            if(result) {
+                return result;
+            }
+        }
+        return 0;
+    }
+
+    private void assign(ref const(String) rhs) {
+        if(rhs.length < SmallStringSize) {
+            this.direct[0 .. rhs.length + 1] = rhs.direct[0 .. rhs.length + 1];
+        } else {
+            () @trusted {
+                this.ptr.capacity = roundUpTo64(rhs.length);
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[0 .. rhs.length] = rhs.ptr.ptr[0 .. rhs.length];
+                this.ptr.ptr[rhs.length] = '\0';
+            }();
+        }
+        this.len = cast(uint)rhs.length;
+    }
+
+    private void assign(string s) {
+        if(s.length < SmallStringSize) {
+            this.direct[0 .. s.length] = s;
+            this.direct[s.length] = '\0';
+        } else {
+            () @trusted {
+                this.ptr.capacity = roundUpTo64(s.length);
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[0 .. s.length] = s[];
+                this.ptr.ptr[s.length] = '\0';
+            }();
+        }
+        this.len = cast(uint)s.length;
     }
 
     static void append(ref String sink, string src) {
@@ -331,4 +355,13 @@ unittest {
     assert(roundUpTo64(64) == 128);
     assert(roundUpTo64(65) == 128);
     assert(roundUpTo64(128) == 192);
+}
+
+private auto assumePure(T)(T t) @safe {
+    import std.traits : FunctionAttribute, SetFunctionAttributes
+        , isFunctionPointer, isDelegate, functionAttributes, functionLinkage;
+
+    static assert(isFunctionPointer!T || isDelegate!T);
+    enum attrs = functionAttributes!T | FunctionAttribute.pure_;
+    return () @trusted { return cast(SetFunctionAttributes!(T, functionLinkage!T, attrs))t; }();
 }
