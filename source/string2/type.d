@@ -7,11 +7,11 @@ import std.stdio;
 struct String {
 @safe pure:
     enum SmallStringSize = 59;
-    private struct Ptr {
+    package struct Ptr {
         ulong capacity;
         char* ptr;
     }
-    private union {
+    package union {
         // 59 + trailing \0
         char[SmallStringSize + 1] direct;
         Ptr ptr;
