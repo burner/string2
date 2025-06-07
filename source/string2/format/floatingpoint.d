@@ -18,13 +18,18 @@ void fformattedWriteImplNatural(ref String array, FormatSpec spec, double value)
 
 	array ~= '.';
 
-	double f = (value - cast(double)integral) * cast(double)(pow(10, (spec.precision == 0
+	double f = (value - cast(double)integral) 
+            * cast(double)(fpow(10, (spec.precision == 0
 					? 6
 					: spec.precision)));
-	long frac = abs(assumePure(lround, f));
+	long frac = abs(assumePure(&lround, f));
 	String fracArr;
 	fformattedWriteImpl(fracArr, spec, frac);
 	array ~= fracArr;
+}
+
+double fpow(double a, double b) {
+    return assumePure(pow(a, b));
 }
 
 long abs(long i) @safe pure nothrow {
