@@ -141,6 +141,35 @@ struct String {
         String.append(this, rhs);
     }
 
+    void opOpAssign(string op: "~")(char rhs) {
+        uint newLen = this.len + 1;
+        if(newLen < SmallStringSize) {
+            this.direct[this.len] = rhs;
+            this.len = cast(uint)(this.len + 1);
+            this.direct[this.len] = '\0';
+        } else if(newLen >= SmallStringSize) {
+            () @trusted {
+            if(this.len < SmallStringSize) {
+                String tmp = this;
+                this.ptr.capacity = roundUpTo64(newLen);
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[0 .. tmp.len] = tmp.direct[0 .. tmp.len];
+                this.ptr.ptr[tmp.len] = rhs;
+                this.ptr.ptr[tmp.len + 1] = '\0';
+            } else {
+                if(newLen > this.ptr.capacity) {
+                    GC.realloc(this.ptr.ptr, newLen);
+                    this.ptr.capacity = roundUpTo64(newLen);
+                }
+                this.ptr.ptr = allocateCharArray(this.ptr.capacity);
+                this.ptr.ptr[this.len] = rhs;
+                this.ptr.ptr[this.len + 1] = '\0';
+            }
+            }();
+            this.len = cast(uint)newLen;
+        }
+    }
+
     bool isNullTerminated() const {
         if(this.len < SmallStringSize) {
             return this.direct[this.len] == '\0';
