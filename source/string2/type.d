@@ -4,6 +4,8 @@ import core.exception : RangeError;
 import core.memory;
 import std.stdio;
 
+import string2.helper;
+
 struct String {
 @safe pure:
     enum SmallStringSize = 59;
@@ -407,13 +409,4 @@ unittest {
     assert(roundUpTo64(64) == 128);
     assert(roundUpTo64(65) == 128);
     assert(roundUpTo64(128) == 192);
-}
-
-private auto assumePure(T)(T t) @safe {
-    import std.traits : FunctionAttribute, SetFunctionAttributes
-        , isFunctionPointer, isDelegate, functionAttributes, functionLinkage;
-
-    static assert(isFunctionPointer!T || isDelegate!T);
-    enum attrs = functionAttributes!T | FunctionAttribute.pure_;
-    return () @trusted { return cast(SetFunctionAttributes!(T, functionLinkage!T, attrs))t; }();
 }

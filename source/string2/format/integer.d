@@ -6,6 +6,8 @@ import string2.reverse;
 import string2.format.formatspec;
 import string2.format.insertseparator;
 
+@safe pure:
+
 void fformattedWriteImpl(ref String array, FormatSpec spec, long value) {
 	int base = spec.base == 0
 		? 10

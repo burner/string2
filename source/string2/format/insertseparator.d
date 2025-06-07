@@ -3,6 +3,8 @@ module string2.format.insertseparator;
 import string2.type;
 import string2.format.formatspec;
 
+@safe pure:
+
 void insertSeparator(ref String arr, FormatSpec spec) {
 	String tmp;
 
