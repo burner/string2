@@ -10,42 +10,45 @@ import string2.format.integer;
 
 @safe pure:
 
-void fformattedWriteImplNatural(ref String array, FormatSpec spec, double value) {
+void fformattedWriteImplNatural(ref String sOut, FormatSpec spec, double value) {
+	String array;
 	long integral = cast(long)value;
 	fformattedWriteImpl(array, spec, integral);
 
 	array ~= '.';
 
 	double f = (value - cast(double)integral) 
-            * cast(double)(powP(10, (spec.precision == 0
+			* cast(double)(powP(10, (spec.precision == 0
 					? 6
 					: spec.precision)));
 	long frac = abs(lroundP(f));
 	String fracArr;
 	fformattedWriteImpl(fracArr, spec, frac);
 	array ~= fracArr;
+
+	sOut ~= array;
 }
 
 long powP(long base, long exp) nothrow {
-    long ret = 1;
-    foreach(i; 0 .. exp) {
-        ret *= base;
-    }
-    return ret;
+	long ret = 1;
+	foreach(i; 0 .. exp) {
+		ret *= base;
+	}
+	return ret;
 }
 
 long lroundP(double a) nothrow {
-    long l = cast(long)a;
-    double frac = a - l;
+	long l = cast(long)a;
+	double frac = a - l;
 
-    return  frac < 0.5 ? l : (l + 1);
+	return  frac < 0.5 ? l : (l + 1);
 }
 
 unittest {
-    assert(lroundP(1.5) == 2);
-    assert(lroundP(1.4999) == 1);
+	assert(lroundP(1.5) == 2);
+	assert(lroundP(1.4999) == 1);
 }
 
 long abs(long i) nothrow {
-    return i < 0 ? -i : i;
+	return i < 0 ? -i : i;
 }
