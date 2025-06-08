@@ -26,7 +26,7 @@ void fformattedWriteImplNatural(ref String array, FormatSpec spec, double value)
 	array ~= fracArr;
 }
 
-long powP(long base, long exp) pure {
+long powP(long base, long exp) nothrow {
     long ret = 1;
     foreach(i; 0 .. exp) {
         ret *= base;
@@ -34,7 +34,7 @@ long powP(long base, long exp) pure {
     return ret;
 }
 
-long lroundP(double a) pure {
+long lroundP(double a) nothrow {
     long l = cast(long)a;
     double frac = a - l;
 
@@ -46,6 +46,6 @@ unittest {
     assert(lroundP(1.4999) == 1);
 }
 
-long abs(long i) @safe pure nothrow {
+long abs(long i) nothrow {
     return i < 0 ? -i : i;
 }
