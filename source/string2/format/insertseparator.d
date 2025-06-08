@@ -24,5 +24,5 @@ void insertSeparator(ref String arr, FormatSpec spec) {
 		tmp ~= arr[idx];
 	}
 
-    arr = tmp;
+	arr = tmp;
 }

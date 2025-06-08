@@ -15,3 +15,9 @@ unittest {
     fformattedWrite(s, "Hello %s", "World");
     cmpString(s, "Hello World");
 }
+
+unittest {
+    String s;
+    fformattedWrite(s, "%5s", 10);
+    cmpString(s, "   10");
+}

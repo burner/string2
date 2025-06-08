@@ -5,6 +5,7 @@ import string2.reverse;
 
 import string2.format.formatspec;
 import string2.format.insertseparator;
+import string2.format.insertwidth;
 
 @safe pure:
 
@@ -28,8 +29,9 @@ void fformattedWriteImpl(ref String sOut, FormatSpec spec, long value) {
 	reverse(array);
 
 	insertSeparator(array, spec);
+	insertWidth(array, spec);
     sOut ~= array;
 }
 
-static const char[71] numChars = 
+static const char[71] numChars =
 	"zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz";

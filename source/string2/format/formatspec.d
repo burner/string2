@@ -6,6 +6,9 @@ struct FormatSpec {
     ubyte seperatorWidth : 4;
     char seperator : 8;
     ubyte precision : 5;
+	bool zero : 1;
+	bool minus : 1;
+	bool plus : 1;
 }
 
 static assert(FormatSpec.sizeof < 8);

@@ -7,24 +7,31 @@ import string2.helper;
 import string2.format.formatspec;
 import string2.format.insertseparator;
 import string2.format.integer;
+import string2.format.insertwidth;
 
 @safe pure:
 
 void fformattedWriteImplNatural(ref String sOut, FormatSpec spec, double value) {
 	String array;
 	long integral = cast(long)value;
-	fformattedWriteImpl(array, spec, integral);
+	FormatSpec cp = spec;
+	cp.width = 0;
+	fformattedWriteImpl(array, cp, integral);
 
 	array ~= '.';
 
-	double f = (value - cast(double)integral) 
+	double f = (value - cast(double)integral)
 			* cast(double)(powP(10, (spec.precision == 0
 					? 6
 					: spec.precision)));
 	long frac = abs(lroundP(f));
 	String fracArr;
-	fformattedWriteImpl(fracArr, spec, frac);
+
+	cp.minus = false;
+	cp.plus = false;
+	fformattedWriteImpl(fracArr, cp, frac);
 	array ~= fracArr;
+	insertWidth(array, spec);
 
 	sOut ~= array;
 }
