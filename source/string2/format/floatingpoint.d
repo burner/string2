@@ -1,7 +1,5 @@
 module string2.format.floatingpoint;
 
-import core.stdc.math : pow, lround;
-
 import string2.type;
 import string2.reverse;
 import string2.helper;
@@ -19,17 +17,33 @@ void fformattedWriteImplNatural(ref String array, FormatSpec spec, double value)
 	array ~= '.';
 
 	double f = (value - cast(double)integral) 
-            * cast(double)(fpow(10, (spec.precision == 0
+            * cast(double)(powP(10, (spec.precision == 0
 					? 6
 					: spec.precision)));
-	long frac = abs(assumePure(&lround, f));
+	long frac = abs(lroundP(f));
 	String fracArr;
 	fformattedWriteImpl(fracArr, spec, frac);
 	array ~= fracArr;
 }
 
-double fpow(double a, double b) {
-    return assumePure(pow(a, b));
+long powP(long base, long exp) pure {
+    long ret = 1;
+    foreach(i; 0 .. exp) {
+        ret *= base;
+    }
+    return ret;
+}
+
+long lroundP(double a) pure {
+    long l = cast(long)a;
+    double frac = a - l;
+
+    return  frac < 0.5 ? l : (l + 1);
+}
+
+unittest {
+    assert(lroundP(1.5) == 2);
+    assert(lroundP(1.4999) == 1);
 }
 
 long abs(long i) @safe pure nothrow {
