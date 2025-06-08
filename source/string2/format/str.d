@@ -12,4 +12,3 @@ void fformattedWriteImpl(ref String sOut, FormatSpec spec, string value) {
 	insertSeparator(array, spec);
     sOut ~= array;
 }
-

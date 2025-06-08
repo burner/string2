@@ -9,8 +9,8 @@ bool startsWith(in const(String) toSearchIn, in const(String) toSearch) {
         return false;
     }
 
-    const(char)* toSearchInPtr = toSearchIn.toStringZ();
-    const(char)* toSearchPtr = toSearch.toStringZ();
+    const(char)* toSearchInPtr = toSearchIn.toStringC();
+    const(char)* toSearchPtr = toSearch.toStringC();
 
     for(size_t idx = 0; idx < toSearch.length; ++idx) {
         if(() @trusted { return toSearchPtr[idx] != toSearchInPtr[idx]; }()) {
@@ -24,7 +24,7 @@ bool startsWith(in const(String) toSearchIn, in const(string) toSearch) {
     if(toSearchIn.length < toSearch.length) {
         return false;
     }
-    const(char)* toSearchInPtr = toSearchIn.toStringZ();
+    const(char)* toSearchInPtr = toSearchIn.toStringC();
 
     for(size_t idx = 0; idx < toSearch.length; ++idx) {
         if(() @trusted { return toSearch[idx] != toSearchInPtr[idx]; }()) {

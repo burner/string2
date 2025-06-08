@@ -5,6 +5,7 @@ import string2.format.impl;
 import string2.format.formatspec;
 import string2.format.integer;
 import string2.format.floatingpoint;
+import string2.format.str;
 
 @safe pure:
 
@@ -26,16 +27,16 @@ void fformattedWrite(Args...)(ref String sOut, string format, Args args) {
 		} else if(prevIsAmp && format[cur] == '.') {
 			cur2 = 1;
 			int preci = 4;
-			if(cur + cur2 < format.length 
-					&& format[cur + cur2] >= '0' 
-					&& format[cur + cur2] <= '9') 
+			if(cur + cur2 < format.length
+					&& format[cur + cur2] >= '0'
+					&& format[cur + cur2] <= '9')
 			{
 				preci = format[cur + cur2] - '0';
 				++cur2;
 			}
-			if(cur + cur2 < format.length 
-					&& format[cur + cur2] >= '0' 
-					&& format[cur + cur2] <= '9') 
+			if(cur + cur2 < format.length
+					&& format[cur + cur2] >= '0'
+					&& format[cur + cur2] <= '9')
 			{
 				preci = preci * 10 + format[cur + cur2] - '0';
 				++cur2;
@@ -81,6 +82,6 @@ void formatWriteForward(T)(ref String sOut, FormatSpec spec, T t) {
 	}} else static if(__traits(isFloating, T)) {{
 		fformattedWriteImplNatural(sOut, spec, cast(double)t);
 	}} else static if(is(T == string)) {{
-		assert(false, "TODO");
+		fformattedWriteImpl(sOut, spec, t);
 	}}
 }

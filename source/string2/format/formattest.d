@@ -10,3 +10,8 @@ unittest {
     cmpString(s, "Hello 10");
 }
 
+unittest {
+    String s;
+    fformattedWrite(s, "Hello %s", "World");
+    cmpString(s, "Hello World");
+}
