@@ -8,18 +8,18 @@ import string2.type;
 
 @safe pure:
 
-void cmpString(ref const(String) a, string b, int line = __LINE__) {
+void cmpString(ref const(String) a, string b, string file = __FILE__, int line = __LINE__) {
     if(a.length != b.length) {
         throw new AssertError("a.length = "
             ~ to!(string)(a.length)
             ~ " != b.length = "
-            ~ to!(string)(b.length), __FILE__, line);
+            ~ to!(string)(b.length), file, line);
     }
     foreach(idx; 0 .. a.length) {
         if(a[idx] != b[idx]) {
             throw new AssertError("idx " ~ to!(string)(idx)
                 ~ " a = '" ~ a[idx] ~ "' b = '" ~ b[idx] ~ "'"
-                ,  __FILE__, line);
+                ,  file, line);
         }
     }
 }

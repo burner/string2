@@ -12,6 +12,7 @@ void insertWidth(ref String arr, FormatSpec spec) {
 		foreach(_; 0 .. toPad) {
 			tmp ~= spec.zero ? '0' : ' ';
 		}
+		tmp ~= arr;
 		arr = tmp;
 	}
 }

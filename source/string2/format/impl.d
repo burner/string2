@@ -24,6 +24,25 @@ void fformattedWrite(Args...)(ref String sOut, string format, Args args) {
 			sOut ~= format[last .. cur];
 			++cur;
 			last = cur;
+		} else if(prevIsAmp && format[cur] >= '1' && format[cur] <= '9') {
+			int width = format[cur] - '0';
+			++cur2;
+			if(cur + cur2 < format.length
+					&& format[cur + cur2] >= '0'
+					&& format[cur + cur2] <= '9')
+			{
+				width = width * 10 + format[cur + cur2] - '0';
+				++cur2;
+			}
+			if(cur + cur2 < format.length
+					&& format[cur + cur2] >= '0'
+					&& format[cur + cur2] <= '9')
+			{
+				width = width * 100 + format[cur + cur2] - '0';
+				++cur2;
+			}
+			cur += cur2;
+			spec.width = cast(ubyte)width;
 		} else if(prevIsAmp && format[cur] == '.') {
 			cur2 = 1;
 			int preci = 4;
