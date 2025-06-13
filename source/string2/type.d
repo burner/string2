@@ -1,5 +1,6 @@
 module string2.type;
 
+import core.internal.hash;
 import core.exception : RangeError;
 import core.memory;
 import std.stdio;
@@ -58,6 +59,10 @@ struct String {
 				return this.ptr.ptr[0 .. this.len] == s;
 			}();
 		}
+	}
+
+	size_t opHash() const {
+		return hashOf(this.toStringD());
 	}
 
 	char opIndex(size_t idx) const {
@@ -231,9 +236,9 @@ struct String {
 		this.len = remaining;
 	}
 
-	void popBack(uint cntToPop) {
+	void popBack(size_t cntToPop) {
 		cntToPop = cntToPop > this.len ? this.len : cntToPop;
-		uint remaining = this.len - cntToPop;
+		uint remaining = cast(uint)(this.len - cntToPop);
 		if(this.len < SmallStringSize) {
 			this.direct[remaining] = '\0';
 		} else if(remaining < SmallStringSize && this.len > SmallStringSize) {
@@ -311,8 +316,8 @@ struct String {
 		/* ss = small space, h = Heap
 			| Sink | Rslt | Copy From ss |
 			| ss   | ss   | No
-			| ss   | h	| Yes
-			| h	| h	| No
+			| ss   | h	  | Yes
+			| h	   | h	  | No
 		*/
 		const newLen = sink.len + src.length;
 		if(newLen < SmallStringSize) {
@@ -348,8 +353,8 @@ struct String {
 			| ss   | ss  | ss   | No
 			| ss   | ss  | h	| Yes
 			| ss   | h   | h	| Yes
-			| h	| ss  | h	| No
-			| h	| h   | h	| No
+			| h	   | ss  | h	| No
+			| h	   | h   | h	| No
 		*/
 		const newLen = sink.len + src.len;
 		if(newLen < SmallStringSize) {
