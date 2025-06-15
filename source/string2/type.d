@@ -167,8 +167,9 @@ struct String {
 				this.ptr.ptr[tmp.len + 1] = '\0';
 			} else {
 				if(newLen > this.ptr.capacity) {
-					this.ptr.capacity = roundUpTo64(newLen + 1);
-					this.ptr.ptr = cast(char*)GC.realloc(cast(void*)this.ptr.ptr, this.ptr.capacity);
+					this.ptr.capacity = roundUpTo64(newLen);
+					this.ptr.ptr = cast(char*)GC.realloc(cast(void*)this.ptr.ptr
+							, this.ptr.capacity);
 				}
 				this.ptr.ptr[this.len] = rhs;
 				this.ptr.ptr[this.len + 1] = '\0';
@@ -336,10 +337,9 @@ struct String {
 				sink.ptr.ptr[tmp.len + src.length] = '\0';
 			} else {
 				if(newLen > sink.ptr.capacity) {
-					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 				}
-				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
 				sink.ptr.ptr[sink.len .. sink.len + src.length] = src[0 .. src.length];
 				sink.ptr.ptr[sink.len + src.length] = '\0';
 			}
@@ -380,18 +380,16 @@ struct String {
 				sink.ptr.ptr[tmp.len + src.len] = '\0';
 			} else if(sink.len >= SmallStringSize && src.len < SmallStringSize) {
 				if(newLen > sink.ptr.capacity) {
-					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 				}
-				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
 				sink.ptr.ptr[sink.len .. sink.len + src.len] = src.direct[0 .. src.len];
 				sink.ptr.ptr[sink.len + src.len] = '\0';
 			} else { // if(sink.len >= SmallStringSize && src.len >= SmallStringSize) {
 				if(newLen > sink.ptr.capacity) {
-					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 				}
-				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
 				sink.ptr.ptr[sink.len .. sink.len + src.len] = src.ptr.ptr[0 .. src.len];
 				sink.ptr.ptr[sink.len + src.len] = '\0';
 			}
