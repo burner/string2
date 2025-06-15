@@ -4,8 +4,14 @@
 	],
 	"copyright": "Copyright © 2025, Robert Schadek",
 	"description": "A string library for dlang",
-    "dflags": ["-checkaction=context", "-preview=bitfields"],
-	"dflags-ldc": ["-d", "-ftime-trace", "-ftime-trace-file=$PACKAGE_DIR/trace.json", "-wi"],
+    "dflags": ["-preview=bitfields"],
+	"configurations": [
+		{ "name": "library",
+			"excludedSourceFiles": ["source/string2/*.test.d", "source/string2/testhelper.d"
+				, "source/string2/tests.d"
+			]
+		}
+	],
 	"license": "BSL-1.0",
 	"name": "string2"
 }

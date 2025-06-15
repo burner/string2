@@ -9,6 +9,12 @@ unittest {
 	string h = "Hello World Hello World Hello World Hello World "
 		~ "Hello World Hello World Hello World Hello World "
 		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
+		~ "Hello World Hello World Hello World Hello World "
 		~ "Hello World Hello World Hello World Hello World ";
 
 	String r;
