@@ -10,5 +10,5 @@ unittest {
 	String w = "World";
 
 	String hw = h ~ " " ~ w;
-
+	cmpString(hw, "Hello World");
 }

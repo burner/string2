@@ -13,12 +13,19 @@ void cmpString(ref const(String) a, string b, string file = __FILE__, int line =
         throw new AssertError("a.length = "
             ~ to!(string)(a.length)
             ~ " != b.length = "
-            ~ to!(string)(b.length), file, line);
+            ~ to!(string)(b.length)
+			~ " '"
+			~ a.toStringD()
+			~ "'"
+			, file, line);
     }
     foreach(idx; 0 .. a.length) {
         if(a[idx] != b[idx]) {
             throw new AssertError("idx " ~ to!(string)(idx)
                 ~ " a = '" ~ a[idx] ~ "' b = '" ~ b[idx] ~ "'"
+				~ " '"
+				~ a.toStringD()
+				~ "'"
                 ,  file, line);
         }
     }
