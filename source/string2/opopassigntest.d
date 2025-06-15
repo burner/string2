@@ -14,6 +14,7 @@ unittest {
 	String r;
 	foreach(idx; 0 .. h.length) {
 		r ~= h[idx];
+		cmpString(r, h[0 .. idx + 1]);
 	}
 	cmpString(r, h);
 }

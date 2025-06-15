@@ -167,10 +167,9 @@ struct String {
 				this.ptr.ptr[tmp.len + 1] = '\0';
 			} else {
 				if(newLen > this.ptr.capacity) {
-					GC.realloc(this.ptr.ptr, newLen);
-					this.ptr.capacity = roundUpTo64(newLen);
+					this.ptr.capacity = roundUpTo64(newLen + 1);
+					this.ptr.ptr = cast(char*)GC.realloc(cast(void*)this.ptr.ptr, this.ptr.capacity);
 				}
-				this.ptr.ptr = allocateCharArray(this.ptr.capacity);
 				this.ptr.ptr[this.len] = rhs;
 				this.ptr.ptr[this.len + 1] = '\0';
 			}
@@ -337,7 +336,7 @@ struct String {
 				sink.ptr.ptr[tmp.len + src.length] = '\0';
 			} else {
 				if(newLen > sink.ptr.capacity) {
-					GC.realloc(sink.ptr.ptr, newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
 				}
 				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
@@ -381,7 +380,7 @@ struct String {
 				sink.ptr.ptr[tmp.len + src.len] = '\0';
 			} else if(sink.len >= SmallStringSize && src.len < SmallStringSize) {
 				if(newLen > sink.ptr.capacity) {
-					GC.realloc(sink.ptr.ptr, newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
 				}
 				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
@@ -389,7 +388,7 @@ struct String {
 				sink.ptr.ptr[sink.len + src.len] = '\0';
 			} else { // if(sink.len >= SmallStringSize && src.len >= SmallStringSize) {
 				if(newLen > sink.ptr.capacity) {
-					GC.realloc(sink.ptr.ptr, newLen);
+					sink.ptr.ptr = cast(char*)GC.realloc(cast(void*)sink.ptr.ptr, newLen);
 					sink.ptr.capacity = roundUpTo64(newLen);
 				}
 				sink.ptr.ptr = allocateCharArray(sink.ptr.capacity);
