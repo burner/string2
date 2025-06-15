@@ -6,14 +6,13 @@
 	"description": "A string library for dlang",
     "dflags": ["-preview=bitfields"],
 	"configurations": [
-		{ "name": "library",
-			"excludedSourceFiles": ["source/string2/*.test.d", "source/string2/testhelper.d"
-				, "source/string2/tests.d"
-			]
+		{ "name": "library"
+		, "excludedSourceFiles": [ "source/string2/*test.d", "source/string2/testhelper.d"
+				, "source/string2/tests.d", "source/string2/format/*test.d" ]
 		},
 		{ "name": "unittest"
-		, "sourceFiles": ["source/string2/*.test.d", "source/string2/testhelper.d"
-				, "source/string2/tests.d"]
+		, "sourceFiles": [ "source/string2/*test.d", "source/string2/testhelper.d"
+				, "source/string2/tests.d", "source/string2/format/*test.d" ]
 		}
 	],
 	"license": "BSL-1.0",
