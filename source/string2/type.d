@@ -125,13 +125,15 @@ struct String {
 	}
 
 	String opBinary(string op: "~")(ref const(String) rhs) const {
-		String ret = this;
+		String ret;
+		String.append(ret, this);
 		String.append(ret, rhs);
 		return ret;
 	}
 
 	String opBinary(string op: "~")(string rhs) const {
-		String ret = this;
+		String ret;
+		String.append(ret, this);
 		String.append(ret, rhs);
 		return ret;
 	}
@@ -347,7 +349,7 @@ struct String {
 		}
 	}
 
-	static void append(ref String sink, ref String src) {
+	static void append(ref String sink, ref inout(String) src) {
 		/* ss = small space, h = Heap
 			| Sink | Src | Rslt | Copy From SS |
 			| ss   | ss  | ss   | No
