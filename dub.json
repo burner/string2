@@ -4,11 +4,14 @@
 	],
 	"copyright": "Copyright © 2025, Robert Schadek",
 	"description": "A string library for dlang",
-    "dflags": ["-preview=bitfields"],
+    "dflags-dmd": ["-preview=bitfields"],
+    "dflags-ldc": ["-preview=bitfields"],
+    "dflags-gdc": ["-fpreview=bitfields"],
 	"configurations": [
 		{ "name": "library"
 		, "excludedSourceFiles": [ "source/string2/*test.d", "source/string2/testhelper.d"
 				, "source/string2/tests.d", "source/string2/format/*test.d" ]
+		, "dflags-ldc": [ "-ftime-trace", "-ftime-trace-file=$PACKAGE_DIR/trace.json", "-wi" ]
 		},
 		{ "name": "unittest"
 		, "sourceFiles": [ "source/string2/*test.d", "source/string2/testhelper.d"
