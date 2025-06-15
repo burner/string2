@@ -10,6 +10,10 @@
 			"excludedSourceFiles": ["source/string2/*.test.d", "source/string2/testhelper.d"
 				, "source/string2/tests.d"
 			]
+		},
+		{ "name": "unittest"
+		, "sourceFiles": ["source/string2/*.test.d", "source/string2/testhelper.d"
+				, "source/string2/tests.d"]
 		}
 	],
 	"license": "BSL-1.0",
